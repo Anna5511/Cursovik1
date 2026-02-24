@@ -6,6 +6,7 @@
 #include <Windows.h>
 using namespace std;
 
+//комментарий для проверки гита
 
 float mmm(float* M, int  r) {
     int p = -1;
