@@ -6,6 +6,10 @@
 #include <Windows.h>
 using namespace std;
 
+bool srt(float*** she, float*** ps) {
+    //вот тут будет функция, чтобы создать оригинальные шестерки
+}
+
 float mmm(float* M, int  r) {
     int p = -1;
     for (int i = 0; i < r; i++) {
