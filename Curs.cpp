@@ -6,8 +6,6 @@
 #include <Windows.h>
 using namespace std;
 
-//комментарий для проверки гита 2
-
 float mmm(float* M, int  r) {
     int p = -1;
     for (int i = 0; i < r; i++) {
