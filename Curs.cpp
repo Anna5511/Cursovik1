@@ -96,12 +96,12 @@ void groupCyclicPermutations(float*** points, int size) {
 }
 
 // Функция для вывода шестиугольника (для отладки)
-void printHexagon(float* hex[6]) {
-    for (int i = 0; i < 6; i++) {
-         cout << "(" << hex[i][0] << ", " << hex[i][1] << ") ";
-    }
-     cout <<  endl;
-}
+//void printHexagon(float* hex[6]) {
+//    for (int i = 0; i < 6; i++) {
+//         cout << "(" << hex[i][0] << ", " << hex[i][1] << ") ";
+//    }
+//     cout <<  endl;
+//}
 
 // Функция для проверки, является ли один шестиугольник циклической перестановкой другого
 bool isCyclicPermutation(float* h1[6], float* h2[6]) {
@@ -307,15 +307,15 @@ int poisk_6(float** mass, int n, ofstream& log, float p, float*** she, ofstream&
     log << "Вот точки, которые могут быть в роли шестиугольника:\n";
     for (int i0 = 0; i0 < n; i0++) {
         for (int i1 = 0; i1 < n; i1++) {
-            if (i0 == i1) continue;
+            if (i1 == i0) continue;
             for (int i2 = 0; i2 < n; i2++) {
-                if (i1 == i2) continue;
+                if (i2 == i1 || i2 == i0) continue;
                 for (int i3 = 0; i3 < n; i3++) {
-                    if (i2 == i3) continue;
+                    if (i3 == i2 || i3 == i1 || i3 == i0) continue;
                     for (int i4 = 0; i4 < n; i4++) {
-                        if (i3 == i4) continue;
+                        if (i4 == i3 || i4 == i2 || i4 == i1 || i4 == i0) continue;
                         for (int i5 = 0; i5 < n; i5++) {
-                            if (i4 == i5) continue;
+                            if (i5 == i4 || i5 == i3 || i5 == i2 || i5 == i1 || i5 == i0) continue;
                             bool flag = false;
 
                             float SH[6][2] = { {mass[i0][0], mass[i0][1]}, {mass[i1][0], mass[i1][1]}, {mass[i2][0], mass[i2][1]}, {mass[i3][0], mass[i3][1]}, {mass[i4][0], mass[i4][1]}, {mass[i5][0], mass[i5][1]} };
