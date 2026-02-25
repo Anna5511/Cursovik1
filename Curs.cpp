@@ -160,7 +160,6 @@ float pl(float*** p, int n) {
     return S;
 }
 
-
 // Проверка принадлежности точек
 void kal(float** p, float* p_pro, float*** she, int ss, int m, float pp, ofstream& log) {
     log << "\nЗаход в kal\n";
@@ -195,8 +194,7 @@ void kal(float** p, float* p_pro, float*** she, int ss, int m, float pp, ofstrea
     }
 }
 
-
-// Проверка скалярного произведения векторов
+// Проверка скалярного произведения векторов (выпуклость)
 bool v_t1_t2(float M[6][2], float p) {
 
     bool a1 = ((M[2][0] - M[1][0]) * (M[3][1] - M[2][1]) - (M[3][0] - M[2][0]) * (M[2][1] - M[1][1])) > 0;
@@ -222,7 +220,6 @@ bool ds_t1_t2(float M[6][2], float p) {
     else if (((sqrt(pow((a1 - a2), 2))) < p) && ((sqrt(pow((a1 - a3), 2))) < p) && ((sqrt(pow((a1 - a4), 2))) < p) && ((sqrt(pow((a1 - a5), 2))) < p) && ((sqrt(pow((a1 - a6), 2))) < p)) return true;
     else return false;
 }
-
 
 // Проверка центров
 bool c_t1_t2(float M[6][2], float p) {
