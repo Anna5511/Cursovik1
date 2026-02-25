@@ -5,16 +5,6 @@
 #include <cmath>
 using namespace std;
 
-// Вспомогательная функция для сравнения float
-bool floatEqual(float a, float b) {
-    return  abs(a - b) < 1e-6f;
-}
-
-// Функция для сравнения двух точек
-bool pointEqual(float* p1, float* p2) {
-    return floatEqual(p1[0], p2[0]) && floatEqual(p1[1], p2[1]);
-}
-
 // Функция для копирования точки
 void copyPoint(float* dest, float* src) {
     dest[0] = src[0];
@@ -24,14 +14,14 @@ void copyPoint(float* dest, float* src) {
 // Функция для сравнения двух шестиугольников (лексикографически)
 int compareHexagons(float* h1[6], float* h2[6]) {
     for (int i = 0; i < 6; i++) {
-        if (!floatEqual(h1[i][0], h2[i][0])) {
+        if (h1[i][0] != h2[i][0]) {
             return (h1[i][0] < h2[i][0]) ? -1 : 1;
         }
-        if (!floatEqual(h1[i][1], h2[i][1])) {
+        if (h1[i][1] != h2[i][1]) {
             return (h1[i][1] < h2[i][1]) ? -1 : 1;
         }
     }
-    return 0; // равны
+    return 0;
 }
 
 // Функция для получения канонической формы шестиугольника
@@ -110,7 +100,7 @@ bool isCyclicPermutation(float* h1[6], float* h2[6]) {
         bool match = true;
         for (int i = 0; i < 6; i++) {
             int idx = (i + shift) % 6;
-            if (!pointEqual(h1[i], h2[idx])) {
+            if (!((h1[i][0] == h2[idx][0]) && (h1[i][1] == h2[idx][1]))) {
                 match = false;
                 break;
             }
@@ -119,6 +109,8 @@ bool isCyclicPermutation(float* h1[6], float* h2[6]) {
     }
     return false;
 }
+
+
 
 
 void srt(float*** she, float*** ps) {
@@ -183,7 +175,7 @@ float pl(float*** p, int n) {
     float ay1 = p[n][0][1];
     float ax2 = p[n][1][0];
     float ay2 = p[n][1][1];
-    float a = sqrt((pow((ax1 - ax2), 2)) + pow((ay1 - ay2), 2));
+    float a = sqrt(((ax1 - ax2)*(ax1 - ax2)) + ((ay1 - ay2)* (ay1 - ay2)));
     float S = ((3 * sqrt(3) * a * a) / 2);
     return S;
 }
@@ -346,6 +338,7 @@ int poisk_6(float** mass, int n, ofstream& log, float p, float*** she, ofstream&
                             //}
                             //if (flag) break;
 
+                            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ЗАКОММЕНТИЛА ДЛЯ ОПТИМИЗАЦИИ - НАДО УБРАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             for (int f = 0; f < 6; f++) {
                                 log << "\n" << SH[f][0] << " " << SH[f][1];
                             }
