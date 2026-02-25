@@ -5,14 +5,8 @@
 #include <cmath>
 using namespace std;
 
-// Функция для копирования точки
-void copyPoint(float* dest, float* src) {
-    dest[0] = src[0];
-    dest[1] = src[1];
-}
-
-// Функция для сравнения двух шестиугольников (лексикографически)
-int compareHexagons(float* h1[6], float* h2[6]) {
+// Сравнение шестиугольников
+int srShe(float* h1[6], float* h2[6]) {
     for (int i = 0; i < 6; i++) {
         if (h1[i][0] != h2[i][0]) {
             return (h1[i][0] < h2[i][0]) ? -1 : 1;
@@ -24,8 +18,8 @@ int compareHexagons(float* h1[6], float* h2[6]) {
     return 0;
 }
 
-// Функция для получения канонической формы шестиугольника
-void getCanonicalForm(float* hex[6], float* result[6]) {
+// Получение нужной формы шестиугольника
+void need_f_She(float* hex[6], float* result[6]) {
     float* permutations[6][6]; // 6 перестановок по 6 указателей на точки
 
     // Генерируем все циклические перестановки
@@ -39,7 +33,7 @@ void getCanonicalForm(float* hex[6], float* result[6]) {
     // Находим минимальную перестановку
     int minIdx = 0;
     for (int shift = 1; shift < 6; shift++) {
-        if (compareHexagons(permutations[shift], permutations[minIdx]) < 0) {
+        if (srShe(permutations[shift], permutations[minIdx]) < 0) {
             minIdx = shift;
         }
     }
@@ -50,50 +44,40 @@ void getCanonicalForm(float* hex[6], float* result[6]) {
     }
 }
 
-// Функция обмена двух шестиугольников в массиве
+// Обмен двух шестиугольников в массиве
 void swapHexagons(float*** points, int i, int j) {
     float** temp = points[i];
     points[i] = points[j];
     points[j] = temp;
 }
 
-// Функция для получения канонической формы шестиугольника по индексу
+// Функция для получения нужной  формы шестиугольника по индексу
 void getCanonicalFormAtIndex(float*** points, int index, float* result[6]) {
-    getCanonicalForm(points[index], result);
+    need_f_She(points[index], result);
 }
 
-// Упрощенная версия сортировки (без выделения дополнительной памяти)
 void sortHexagons(float*** points, int size) {
-    // Пузырьковая сортировка на основе канонических форм
     for (int i = 0; i < size - 1; i++) {
         for (int j = 0; j < size - i - 1; j++) {
             float* canonical1[6];
             float* canonical2[6];
 
-            getCanonicalForm(points[j], canonical1);
-            getCanonicalForm(points[j + 1], canonical2);
+            need_f_She(points[j], canonical1);
+            need_f_She(points[j + 1], canonical2);
 
-            if (compareHexagons(canonical1, canonical2) > 0) {
+            if (srShe(canonical1, canonical2) > 0) {
                 swapHexagons(points, j, j + 1);
             }
         }
     }
 }
 
-// Функция для группировки циклических перестановок
+// Группировка циклических перестановок
 void groupCyclicPermutations(float*** points, int size) {
     sortHexagons(points, size);
 }
 
-// Функция для вывода шестиугольника (для отладки)
-//void printHexagon(float* hex[6]) {
-//    for (int i = 0; i < 6; i++) {
-//         cout << "(" << hex[i][0] << ", " << hex[i][1] << ") ";
-//    }
-//     cout <<  endl;
-//}
-
-// Функция для проверки, является ли один шестиугольник циклической перестановкой другого
+// Проверка, является ли один шестиугольник циклической перестановкой другого
 bool isCyclicPermutation(float* h1[6], float* h2[6]) {
     // Проверяем все возможные сдвиги
     for (int shift = 0; shift < 6; shift++) {
@@ -109,9 +93,6 @@ bool isCyclicPermutation(float* h1[6], float* h2[6]) {
     }
     return false;
 }
-
-
-
 
 void srt(float*** she, float*** ps) {
     //вот тут будет функция, чтобы создать оригинальные шестерки
@@ -314,31 +295,6 @@ int poisk_6(float** mass, int n, ofstream& log, float p, float*** she, ofstream&
 
                             float t1, t2, t3, t4;
 
-                            // проверка на равенство точек
-                            //for (int k = 0; k < 6; k++) {
-                            //    for (int k2 = 0; k2 < 6; k2++) {
-                            //        if (k == k2) break;
-                            //        t1 = SH[k][0];
-                            //        t2 = SH[k2][0];
-
-                            //        if (t1 == t2) {
-                            //            t3 = SH[k][1];
-                            //            t4 = SH[k2][1];
-                            //            if (t3 == t4) {
-                            //                /*
-                            //                log << "\nНекоторые точки совпадают!\n";
-                            //                for (int f = 0; f < 6; f++) {
-                            //                    log << "\n" << SH[f][0] << " " << SH[f][1];
-                            //                }
-                            //                log << "\n!!!!!!!!"; */
-                            //                flag = true;
-                            //            }
-                            //        }
-                            //    }
-                            //}
-                            //if (flag) break;
-
-                            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ЗАКОММЕНТИЛА ДЛЯ ОПТИМИЗАЦИИ - НАДО УБРАТЬ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             for (int f = 0; f < 6; f++) {
                                 log << "\n" << SH[f][0] << " " << SH[f][1];
                             }
@@ -550,21 +506,30 @@ int main() {
     pr_m(sorted_she, logq, mx, out, p_pro, q);
 
     //--------------------------------------------
+    // БЛОК ОЧИСТКИ ПАМЯТИ!!!!!
     logq.close();
     out.close();
 
-    for (int i = 0; i < ogr; i++) {
+    for (int i = 0; i < size; i++) {
         delete[] ppp[i];
     }
     delete[] ppp;
     delete[] p_pro;
 
-    /*for (int i = 0; i < q; i++) {
+    for (int i = 0; i < rr; i++) {
         for (int ii = 0; ii < 6; ii++) {
             delete[] she[i][ii];
         }
         delete[] she[i];
-    }*/
+    }
+
+    for (unsigned i = 0; i < rr / 6; i++) {
+        for (unsigned j = 0; j < 6; j++) {
+            delete[] sorted_she[i][j];
+        }
+        delete[] sorted_she[i];
+    }
+    delete[] sorted_she;
 
     return 0;
 }
