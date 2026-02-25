@@ -3,10 +3,125 @@
 #include <iomanip>
 #include <math.h>
 #include <cmath>
-#include <Windows.h>
 using namespace std;
 
-bool srt(float*** she, float*** ps) {
+// Вспомогательная функция для сравнения float
+bool floatEqual(float a, float b) {
+    return  abs(a - b) < 1e-6f;
+}
+
+// Функция для сравнения двух точек
+bool pointEqual(float* p1, float* p2) {
+    return floatEqual(p1[0], p2[0]) && floatEqual(p1[1], p2[1]);
+}
+
+// Функция для копирования точки
+void copyPoint(float* dest, float* src) {
+    dest[0] = src[0];
+    dest[1] = src[1];
+}
+
+// Функция для сравнения двух шестиугольников (лексикографически)
+int compareHexagons(float* h1[6], float* h2[6]) {
+    for (int i = 0; i < 6; i++) {
+        if (!floatEqual(h1[i][0], h2[i][0])) {
+            return (h1[i][0] < h2[i][0]) ? -1 : 1;
+        }
+        if (!floatEqual(h1[i][1], h2[i][1])) {
+            return (h1[i][1] < h2[i][1]) ? -1 : 1;
+        }
+    }
+    return 0; // равны
+}
+
+// Функция для получения канонической формы шестиугольника
+void getCanonicalForm(float* hex[6], float* result[6]) {
+    float* permutations[6][6]; // 6 перестановок по 6 указателей на точки
+
+    // Генерируем все циклические перестановки
+    for (int shift = 0; shift < 6; shift++) {
+        for (int i = 0; i < 6; i++) {
+            int idx = (i + shift) % 6;
+            permutations[shift][i] = hex[idx];
+        }
+    }
+
+    // Находим минимальную перестановку
+    int minIdx = 0;
+    for (int shift = 1; shift < 6; shift++) {
+        if (compareHexagons(permutations[shift], permutations[minIdx]) < 0) {
+            minIdx = shift;
+        }
+    }
+
+    // Копируем минимальную перестановку в результат
+    for (int i = 0; i < 6; i++) {
+        result[i] = permutations[minIdx][i];
+    }
+}
+
+// Функция обмена двух шестиугольников в массиве
+void swapHexagons(float*** points, int i, int j) {
+    float** temp = points[i];
+    points[i] = points[j];
+    points[j] = temp;
+}
+
+// Функция для получения канонической формы шестиугольника по индексу
+void getCanonicalFormAtIndex(float*** points, int index, float* result[6]) {
+    getCanonicalForm(points[index], result);
+}
+
+// Упрощенная версия сортировки (без выделения дополнительной памяти)
+void sortHexagons(float*** points, int size) {
+    // Пузырьковая сортировка на основе канонических форм
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - i - 1; j++) {
+            float* canonical1[6];
+            float* canonical2[6];
+
+            getCanonicalForm(points[j], canonical1);
+            getCanonicalForm(points[j + 1], canonical2);
+
+            if (compareHexagons(canonical1, canonical2) > 0) {
+                swapHexagons(points, j, j + 1);
+            }
+        }
+    }
+}
+
+// Функция для группировки циклических перестановок
+void groupCyclicPermutations(float*** points, int size) {
+    sortHexagons(points, size);
+}
+
+// Функция для вывода шестиугольника (для отладки)
+void printHexagon(float* hex[6]) {
+    for (int i = 0; i < 6; i++) {
+         cout << "(" << hex[i][0] << ", " << hex[i][1] << ") ";
+    }
+     cout <<  endl;
+}
+
+// Функция для проверки, является ли один шестиугольник циклической перестановкой другого
+bool isCyclicPermutation(float* h1[6], float* h2[6]) {
+    // Проверяем все возможные сдвиги
+    for (int shift = 0; shift < 6; shift++) {
+        bool match = true;
+        for (int i = 0; i < 6; i++) {
+            int idx = (i + shift) % 6;
+            if (!pointEqual(h1[i], h2[idx])) {
+                match = false;
+                break;
+            }
+        }
+        if (match) return true;
+    }
+    return false;
+}
+
+
+void srt(float*** she, float*** ps) {
     //вот тут будет функция, чтобы создать оригинальные шестерки
 }
 
@@ -257,15 +372,27 @@ int poisk_6(float** mass, int n, ofstream& log, float p, float*** she, ofstream&
     if (q > 0) {
         log << "\nПравильные шестерки: \n";
         out << "\nПравильные шестерки: \n";
-        for (int i = 0; i < q; i++) {
-            log << "Шестерка N " << i << ":" << endl;
-            for (int f = 0; f < 6; f++) {
-                log << she[i][f][0] << " " << she[i][f][1] << "\n";
-                out << she[i][f][0] << " " << she[i][f][1] << "\n";
+
+        groupCyclicPermutations(she, q);
+        for (unsigned i = 0; i < q / 6; i++) {
+            for (unsigned j = 0; j < 6; j++) {
+                out << she[i][j][0] << " " << she[i][j][1] <<  endl;
+                log << she[i][j][0] << " " << she[i][j][1] << endl;
             }
-            log << "...\n";
-            out << "...\n";
+            out << "..." <<  endl;
+            log << "..." << endl;
         }
+
+
+        //for (int i = 0; i < q; i++) {
+        //    log << "Шестерка N " << i << ":" << endl;
+        //    for (int f = 0; f < 6; f++) {
+        //        log << she[i][f][0] << " " << she[i][f][1] << "\n";
+        //        out << she[i][f][0] << " " << she[i][f][1] << "\n";
+        //    }
+        //    log << "...\n";
+        //    out << "...\n";
+        //}
     }
     return q;
 }
@@ -324,8 +451,10 @@ int nc(ifstream& in) {
 }
 
 int main() {
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
+    //SetConsoleCP(1251);
+    //SetConsoleOutputCP(1251);
+
+    setlocale(LC_ALL, "rus");
 
     const string PATH1 = "C:\\Users\\Анечка\\Documents\\in.txt";
     const string PATH2 = "C:\\Users\\Анечка\\Documents\\out.txt";
@@ -378,7 +507,7 @@ int main() {
     //!!!!!!!!!!!!!!!!!!!!!!
     float p = 0.0001;
 
-    int rr = coord_num * coord_num * coord_num * coord_num;
+    int rr = coord_num * coord_num;
     float*** she = new float** [rr] {};
     for (int i = 0; i < rr; i++) {
         she[i] = new float* [6] {};
@@ -388,7 +517,19 @@ int main() {
     }
 
     //q - кол-во шестерок
-    int q = poisk_6(ppp, coord_num, log, p, she, out);
+    int q = poisk_6(ppp, coord_num, log, p, she, out) / 6;
+
+    float*** sorted_she = new float** [rr / 6];
+    for (unsigned i = 0; i < rr / 6; i++)
+    {
+        sorted_she[i] = new float* [6];
+        for (unsigned j = 0; j < 6; j++)
+        {
+            sorted_she[i][j] = new float[2];
+            sorted_she[i][j][0] = she[i * 6][j][0];
+            sorted_she[i][j][1] = she[i * 6][j][1];
+        }
+    }
 
     if (q == 0) {
         log << "\nПравильные шестиугольники не найдены";
@@ -407,13 +548,13 @@ int main() {
     log.close();
     ofstream logh(PATH3, ios::app);
 
-    kal(ppp, p_pro, she, q, coord_num, p, logh);
+    kal(ppp, p_pro, sorted_she, q, coord_num, p, logh);
 
     logh.close();
     ofstream logq(PATH3, ios::app);
 
     float mx = mmm(p_pro, q);
-    pr_m(she, logq, mx, out, p_pro, q);
+    pr_m(sorted_she, logq, mx, out, p_pro, q);
 
     //--------------------------------------------
     logq.close();
@@ -425,12 +566,12 @@ int main() {
     delete[] ppp;
     delete[] p_pro;
 
-    for (int i = 0; i < q; i++) {
+    /*for (int i = 0; i < q; i++) {
         for (int ii = 0; ii < 6; ii++) {
             delete[] she[i][ii];
         }
         delete[] she[i];
-    }
+    }*/
 
     return 0;
 }
