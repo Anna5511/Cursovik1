@@ -19,7 +19,7 @@ int srShe(float* h1[6], float* h2[6]) {
 }
 
 // Получение нужной формы шестиугольника
-void need_f_She(float* hex[6], float* result[6]) {
+void need_form_She(float* hex[6], float* result[6]) {
     float* permutations[6][6]; // 6 перестановок по 6 указателей на точки
 
     // Генерируем все циклические перестановки
@@ -52,18 +52,18 @@ void swapHexagons(float*** points, int i, int j) {
 }
 
 // Функция для получения нужной  формы шестиугольника по индексу
-void getCanonicalFormAtIndex(float*** points, int index, float* result[6]) {
-    need_f_She(points[index], result);
+void need_form_She_Ind(float*** points, int index, float* result[6]) {
+    need_form_She(points[index], result);
 }
 
-void sortHexagons(float*** points, int size) {
+void sort_She(float*** points, int size) {
     for (int i = 0; i < size - 1; i++) {
         for (int j = 0; j < size - i - 1; j++) {
             float* canonical1[6];
             float* canonical2[6];
 
-            need_f_She(points[j], canonical1);
-            need_f_She(points[j + 1], canonical2);
+            need_form_She(points[j], canonical1);
+            need_form_She(points[j + 1], canonical2);
 
             if (srShe(canonical1, canonical2) > 0) {
                 swapHexagons(points, j, j + 1);
@@ -72,13 +72,13 @@ void sortHexagons(float*** points, int size) {
     }
 }
 
-// Группировка циклических перестановок
-void groupCyclicPermutations(float*** points, int size) {
-    sortHexagons(points, size);
+// Группировка перестановок (они циклические, кстати)
+void group_per(float*** points, int size) {
+    sort_She(points, size);
 }
 
 // Проверка, является ли один шестиугольник циклической перестановкой другого
-bool isCyclicPermutation(float* h1[6], float* h2[6]) {
+bool pro_per(float* h1[6], float* h2[6]) {
     // Проверяем все возможные сдвиги
     for (int shift = 0; shift < 6; shift++) {
         bool match = true;
@@ -93,11 +93,7 @@ bool isCyclicPermutation(float* h1[6], float* h2[6]) {
     }
     return false;
 }
-
-void srt(float*** she, float*** ps) {
-    //вот тут будет функция, чтобы создать оригинальные шестерки
-}
-
+// Поиск максимального значения в массиве
 float mmm(float* M, int  r) {
     int p = -1;
     for (int i = 0; i < r; i++) {
@@ -108,6 +104,7 @@ float mmm(float* M, int  r) {
     return p;
 }
 
+// Вывод наилучших шестерок в файл
 void pr_m(float*** M, ofstream& log, int c, ofstream& out, float* pro, int q) {
     //M - массив шестерок
     //с - наибольшее кол-во элементов в шестиугольнике
@@ -130,6 +127,7 @@ void pr_m(float*** M, ofstream& log, int c, ofstream& out, float* pro, int q) {
     out << "Внутри шестиугольников " << c << " элементов";
 }
 
+// проверка принадлежности
 bool prin(float*** she, int j, float ax, float ay, float s, float p) {
     float ss = 0;
     for (int i = 0; i < 5; i++) {
@@ -151,6 +149,7 @@ bool prin(float*** she, int j, float ax, float ay, float s, float p) {
     return 0;
 }
 
+// Вычисление площади
 float pl(float*** p, int n) {
     float ax1 = p[n][0][0];
     float ay1 = p[n][0][1];
@@ -161,6 +160,8 @@ float pl(float*** p, int n) {
     return S;
 }
 
+
+// Проверка принадлежности точек
 void kal(float** p, float* p_pro, float*** she, int ss, int m, float pp, ofstream& log) {
     log << "\nЗаход в kal\n";
 
@@ -194,6 +195,8 @@ void kal(float** p, float* p_pro, float*** she, int ss, int m, float pp, ofstrea
     }
 }
 
+
+// Проверка скалярного произведения векторов
 bool v_t1_t2(float M[6][2], float p) {
 
     bool a1 = ((M[2][0] - M[1][0]) * (M[3][1] - M[2][1]) - (M[3][0] - M[2][0]) * (M[2][1] - M[1][1])) > 0;
@@ -207,6 +210,7 @@ bool v_t1_t2(float M[6][2], float p) {
     else return 0;
 }
 
+// Проверка равенства сторон
 bool ds_t1_t2(float M[6][2], float p) {
     float a1 = sqrt(pow((M[0][0] - M[1][0]), 2) + pow((M[0][1] - M[1][1]), 2));
     float a2 = sqrt(pow((M[1][0] - M[2][0]), 2) + pow((M[1][1] - M[2][1]), 2));
@@ -219,6 +223,8 @@ bool ds_t1_t2(float M[6][2], float p) {
     else return false;
 }
 
+
+// Проверка центров
 bool c_t1_t2(float M[6][2], float p) {
     float ax1 = (M[0][0] + M[3][0]) / 2;
     float ay1 = (M[0][1] + M[3][1]) / 2;
@@ -233,6 +239,7 @@ bool c_t1_t2(float M[6][2], float p) {
     else return false;
 }
 
+// Проверка равенства диагоналей
 bool dd_t1_t2(float M[6][2], float p) {
     float a1 = sqrt(pow((M[0][0] - M[3][0]), 2) + pow((M[0][1] - M[3][1]), 2));
     float a2 = sqrt(pow((M[2][0] - M[5][0]), 2) + pow((M[2][1] - M[5][1]), 2));
@@ -241,6 +248,7 @@ bool dd_t1_t2(float M[6][2], float p) {
     else return false;
 }
 
+// Сама проверка на правильный шестиугольник (сумма всех функций проверок)
 bool prr(float S[6][2], float p, ofstream& log) {
     if (dd_t1_t2(S, p)) {
         if (c_t1_t2(S, p)) {
@@ -322,7 +330,7 @@ int poisk_6(float** mass, int n, ofstream& log, float p, float*** she, ofstream&
         log << "\nПравильные шестерки: \n";
         out << "\nПравильные шестерки: \n";
 
-        groupCyclicPermutations(she, q);
+        group_per(she, q);
         for (unsigned i = 0; i < q / 6; i++) {
             for (unsigned j = 0; j < 6; j++) {
                 out << she[i][j][0] << " " << she[i][j][1] <<  endl;
@@ -382,6 +390,7 @@ int num_read(ifstream& in, ofstream& out, ofstream& log, float** mass, const int
     return count_n;
 }
 
+// Подсчет количества точек (number count)
 int nc(ifstream& in) {
     int count_n = 0, nn = 0;
     float n;
@@ -400,8 +409,6 @@ int nc(ifstream& in) {
 }
 
 int main() {
-    //SetConsoleCP(1251);
-    //SetConsoleOutputCP(1251);
 
     setlocale(LC_ALL, "rus");
 
