@@ -45,7 +45,7 @@ void need_form_She(float* hex[6], float* result[6]) {
 }
 
 // Обмен двух шестиугольников в массиве
-void swapHexagons(float*** points, int i, int j) {
+void sw_She(float*** points, int i, int j) {
     float** temp = points[i];
     points[i] = points[j];
     points[j] = temp;
@@ -59,37 +59,32 @@ void need_form_She_Ind(float*** points, int index, float* result[6]) {
 void sort_She(float*** points, int size) {
     for (int i = 0; i < size - 1; i++) {
         for (int j = 0; j < size - i - 1; j++) {
-            float* canonical1[6];
-            float* canonical2[6];
+            float* form1[6];
+            float* form2[6];
 
-            need_form_She(points[j], canonical1);
-            need_form_She(points[j + 1], canonical2);
+            need_form_She(points[j], form1);
+            need_form_She(points[j + 1], form2);
 
-            if (srShe(canonical1, canonical2) > 0) {
-                swapHexagons(points, j, j + 1);
+            if (srShe(form1, form2) > 0) {
+                sw_She(points, j, j + 1);
             }
         }
     }
-}
-
-// Группировка перестановок (они циклические, кстати)
-void group_per(float*** points, int size) {
-    sort_She(points, size);
 }
 
 // Проверка, является ли один шестиугольник циклической перестановкой другого
 bool pro_per(float* h1[6], float* h2[6]) {
     // Проверяем все возможные сдвиги
     for (int shift = 0; shift < 6; shift++) {
-        bool match = true;
+        bool flag = true;
         for (int i = 0; i < 6; i++) {
             int idx = (i + shift) % 6;
             if (!((h1[i][0] == h2[idx][0]) && (h1[i][1] == h2[idx][1]))) {
-                match = false;
+                flag = false;
                 break;
             }
         }
-        if (match) return true;
+        if (flag) return true;
     }
     return false;
 }
@@ -327,7 +322,7 @@ int poisk_6(float** mass, int n, ofstream& log, float p, float*** she, ofstream&
         log << "\nПравильные шестерки: \n";
         out << "\nПравильные шестерки: \n";
 
-        group_per(she, q);
+        sort_She(she, q);
         for (unsigned i = 0; i < q / 6; i++) {
             for (unsigned j = 0; j < 6; j++) {
                 out << she[i][j][0] << " " << she[i][j][1] <<  endl;
@@ -438,13 +433,22 @@ int main() {
     }
     points.seekg(0, ios::beg);
     //-----------------------------------------------------------
+    const int ogr = 50;
+
     unsigned size = nc(points);
+
+    if (ogr < size || size < 6) {
+        cout << "Ошибка (Слишком много или мало точек).";
+        out << "Ошибка (Слишком много или мало точек).";
+        return 0;
+    }
+
     float** ppp = new float* [size];
     for (int i = 0; i < size; i++) {
         ppp[i] = new float[2];
     }
 
-    const int ogr = 50;
+    
 
     points.close();
     points.open(PATH1);
